@@ -1,6 +1,6 @@
 {
   "name": "ids_api",
-  "version": "1.0.4",
+  "version": "0.1.0",
   "description": "node api for ids of wisedu",
   "main": "dist/cjs/index.js",
   "module": "dist/esm/index.js",
@@ -16,7 +16,8 @@
     "url": "https://github.com/liudonghua123/ids_api/issues"
   },
   "files": [
-    "dist"
+    "dist",
+    "src"
   ],
   "scripts": {
     "test": "mocha",
@@ -24,7 +25,7 @@
     "start": "ts-node src/index.ts",
     "start:dev": "npx nodemon",
     "build": "rimraf ./dist && tsc -b ./tsconfig.cjs.json ./tsconfig.esm.json ./tsconfig.types.json",
-    "publish": "npm run build && npm publish --access public"
+    "publish": "npm publish --access public"
   },
   "keywords": [],
   "license": "MIT",

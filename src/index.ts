@@ -1,12 +1,14 @@
 import * as dotenv from 'dotenv';
 import debug from 'debug';
-import { signData, generateRandomString, encrypt, doPost, removeEmptyValues, Attributes, AttributesCreate, POST_PARAMS, POST_PARAMS_MESSAGE, POST_PARAMS_BINDINGUSER, POST_PARAMS_UIDSWITCH } from './utlities';
+import { signData, generateRandomString, encrypt, doPost, removeEmptyValues } from './utlities';
+import { ATTRIBUTES_CREATE, POST_PARAMS, ATTRIBUTES, POST_PARAMS_MESSAGE, POST_PARAMS_BINDINGUSER, POST_PARAMS_UIDSWITCH } from './types';
 
 dotenv.config();
 const log = debug('app:log');
 
 const { BASE_URL, APP_ID, APP_SECRET } = process.env;
 if (!BASE_URL || !APP_ID || !APP_SECRET) throw new Error('Missing BASE_URL, APP_ID or APP_SECRET in .env file');
+
 const base_url = BASE_URL as string;
 const app_id = APP_ID as string;
 const app_secret = APP_SECRET as string;
@@ -39,7 +41,7 @@ export async function getAttributes(uid: string) {
  * @param attributes 用户属性信息
  * @returns 
  */
-export async function saveUser(attributes: AttributesCreate) {
+export async function saveUser(attributes: ATTRIBUTES_CREATE) {
   const timeStamp = `${new Date().getTime()}`;
   const randomStr = generateRandomString();
   const { password } = attributes;
@@ -70,7 +72,7 @@ export async function saveUser(attributes: AttributesCreate) {
  * @param attributes 用户属性信息
  * @returns 
  */
-export async function updateAttributes(uid: string, attributes: Attributes) {
+export async function updateAttributes(uid: string, attributes: ATTRIBUTES) {
   const timeStamp = `${new Date().getTime()}`;
   const randomStr = generateRandomString();
   let data: object | string = removeEmptyValues(attributes);
