@@ -34,22 +34,56 @@ export function removeEmptyValues(obj: any) {
     return Object.fromEntries(Object.entries(obj).filter(([_, value]) => !(value === null || value == undefined)));
 }
 
-export interface Attributes {
-    uid?: string | null | undefined,
-    cn?: string | null | undefined,
-    container?: string | null | undefined,
-    status?: 'Active' | 'Inactive',
-    password?: string | null | undefined,
-    pwdPolicy?: 1 | 2 | 3,
-    memberOf?: [string] | null | undefined,
-    alias?: [string] | null | undefined,
-    mail?: string | null | undefined,
-    telephoneNumber?: string | null | undefined,
-}
-
-export interface AttributesCreate {
-    uid: string,
-    cn: string,
+export interface COMMON_ATTRIBUTES {
+    uid?: string, // 用户编码
+    sn?: string, // 姓氏
+    cn?: string, // 姓名
+    password?: string, // 密码
+    alias?: string, // 别名
+    publicKey?: string, // 公钥
+    pwdProtectQuestion?: string, // 密码保护问题
+    pwdProtectAnswer?: string, // 密码保护答案
+    birthday?: string, // 生日
+    securityEmail?: string, // 密码找回邮箱
+    gender?: string, // 性别
+    qq?: string, // QQ号
+    homePage?: string, // 个人主页
+    signature?: string, // 个人签名
+    privacyProtect?: string, // 是否公开
+    /**
+     * group name
+     * common group name:
+     * 教职工：'10'
+     * 离校学生：'lxxs'
+     * 校友：'alumnus'
+     * 本科生：'bk'
+     */
+    memberOf?: [string], // 成员组
+    lifeTime?: string, // 过期时间
+    status?: string, // 帐号状态
+    eduPersonStudentID?: string, // 学号
+    eduPersonStaffID?: string, // 工号
+    eduPersonCardID?: string, // 证件号
+    eduPersonMajor?: string, // 专业
+    eduPersonStreet?: string, // 地址
+    eduPersonOrgDN?: string, // 所属单位
+    pwdPolicy?: 1 | 2 | 3, // 密码策略
+    addFrom?: string, // 用户来源
+    telephoneNumber?: string, // 电话号码
+    isPhoneValidated?: string, // 手机是否验证
+    isEmailValidated?: string, // 邮箱是否验证
+    md4Password?: string, // 无线认证md4密码
+    openUID?: string, // open用户id
+    nickName?: string, // 用户昵称
+    nsRoleDN?: string, // nsRoleDN
+    otherPassword?: string, // 无线认证密码
+    isAliasEdit?: string, // 别名是否可编辑
+    pwdValidity?: string, // 修改密码有效期
+    pwdHistorySelf?: string, // 历史密码
+    pwdResetFlag?: string, // 密码重置标志
+    pwdPromptFlag?: string, // 密码校验提示标志
+    lxzt?: string, // 离校状态
+    unionId?: string, // 身份切换默认值
     /**
      * container name
      * common container name: 
@@ -60,30 +94,50 @@ export interface AttributesCreate {
      * 校友：'ou=alumnus,ou=People'
      * 外聘：'ou=external,ou=People'
      */
+    container?: string, // 容器
+    mail?: string | null | undefined, // 邮箱
+    usertype?: 'staff'|'student'|'affiliate', // 用户类型
+}
+
+export interface Attributes extends COMMON_ATTRIBUTES {
+    uid?: string,
+    cn?: string,
+    container?: string,
+    status?: 'Active' | 'Inactive',
+    password?: string,
+    pwdPolicy?: 1 | 2 | 3,
+    memberOf?: [string],
+}
+
+export interface AttributesCreate extends COMMON_ATTRIBUTES {
+    uid: string,
+    cn: string,
     container: string,
     status: 'Active' | 'Inactive',
     password: string,
     pwdPolicy: 1 | 2 | 3,
-    /**
-     * group name
-     * common group name:
-     * 教职工：'10'
-     * 离校学生：'lxxs'
-     * 校友：'alumnus'
-     * 本科生：'bk'
-     */
     memberOf: [string],
-    alias?: [string] | null | undefined,
-    mail?: string | null | undefined,
-    telephoneNumber?: string | null | undefined,
 }
 
 export interface POST_PARAMS {
     uid?: string | null | undefined,
-    data: string,
+    data?: string | null | undefined,
     timeStamp: string,
     randomStr: string,
     sign: string,
+}
+
+export interface POST_PARAMS_MESSAGE extends POST_PARAMS {
+    title: string,
+    msgContent: string,
+}
+
+export interface POST_PARAMS_BINDINGUSER extends POST_PARAMS {
+    defaultUid: string,
+}
+
+export interface POST_PARAMS_UIDSWITCH extends POST_PARAMS {
+    defaultUserNO: string,
 }
 
 export interface COMMON_RESPONSE {
