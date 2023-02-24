@@ -1,18 +1,41 @@
 {
   "name": "ids_api",
-  "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "version": "1.0.3",
+  "description": "node api for ids of wisedu",
+  "main": "build/cjs/index.js",
+  "module": "build/esm/index.js",
+  "types": "build/types/index.d.ts",
+  "author": "liudonghua",
+  "homepage": "https://github.com/liudonghua123/ids_api",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/liudonghua123/ids_api"
+  },
+  "bugs": {
+    "email": "liudonghua123@gmail.com",
+    "url": "https://github.com/liudonghua123/ids_api/issues"
+  },
+  "files": [
+    "dist"
+  ],
+  "exports": {
+    "./*": {
+      "types": "./dist/types/*.d.ts",
+      "require": "./dist/cjs/*.js",
+      "import": "./dist/esm/*.js",
+      "default": "./dist/esm/*.js"
+    }
+  },
   "scripts": {
     "test": "mocha",
     "lint": "eslint . --fix",
     "start": "ts-node src/index.ts",
     "start:dev": "npx nodemon",
-    "build": "rimraf ./dist && tsc"
+    "build": "rimraf ./dist && tsc -b ./tsconfig.cjs.json ./tsconfig.esm.json ./tsconfig.types.json",
+    "publish": "npm run build && npm publish --access public"
   },
   "keywords": [],
-  "author": "",
-  "license": "ISC",
+  "license": "MIT",
   "devDependencies": {
     "@tsconfig/node18": "^1.0.1",
     "@types/chai": "^4.3.4",
