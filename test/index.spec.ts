@@ -12,14 +12,14 @@ describe('Typescript usage suite', function () {
     });
     it('saveUser should return empty string', async () => {
         const result = await saveUser({ uid, cn: 'abc', password: '123', status: 'Inactive', container: 'ou=student,ou=People', pwdPolicy: 1, memberOf: ['bk'] });
-        equal(result, '');
+        equal(result.data, '');
     });
     it('updateAttributes should return empty string', async () => {
         const result = await updateAttributes(uid, { status: 'Active' });
-        equal(result, '');
+        equal(result.data, '');
     });
     it('updatePassword should return empty string', async () => {
         const result = await updatePassword(uid, 'old_password', 'new_password');
-        equal(result, '');
+        equal(result.data, '');
     });
 });

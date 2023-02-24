@@ -86,6 +86,11 @@ export interface POST_PARAMS {
     sign: string,
 }
 
+export interface COMMON_RESPONSE {
+    status: string,
+    data: any,
+}
+
 /**
  * 
  * @param url 
@@ -94,7 +99,7 @@ export interface POST_PARAMS {
  * @param accessToken 
  * @returns 
  */
-export async function doPost(url: string, params: object, appId: string, accessToken: string): Promise<any> {
+export async function doPost(url: string, params: object, appId: string, accessToken: string): Promise<COMMON_RESPONSE> {
     // https://axios-http.com/docs/urlencoded#automatic-serialization
     // Axios will automatically serialize the data object to urlencoded format if the content-type header is set to application/x-www-form-urlencoded
     const response = await axios.post(url, params, {
@@ -107,12 +112,12 @@ export async function doPost(url: string, params: object, appId: string, accessT
     if (response.status !== 200) {
         throw new Error(`Unexpected response status: ${response.status}`);
     }
-    const responseData = response.data as { status: string, data: any };
+    const responseData = response.data as COMMON_RESPONSE;
     log(`[utilities] response.data: ${JSON.stringify(response.data)}`);
     if (responseData.status !== '1') {
-        throw new Error(`API return errors: ${JSON.stringify(responseData)}`);
+        log(`API maybe return some errors: ${JSON.stringify(responseData)}`);
     }
-    return responseData.data;
+    return responseData;
 }
 
 /**
