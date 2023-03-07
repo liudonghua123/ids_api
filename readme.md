@@ -7,8 +7,8 @@ Recommend to use the lib with typescript, you can get type annotation and code a
 ## How to use it.
 
 1. npm i -S ids_api
-2. set `BASE_URL`, `APP_ID` and `APP_SECRET` environments or you can create `.env` file which contains these envs.
-3. import the lib via `const { getAttributes, saveUser, updateAttributes, updatePassword, updateManagerPassword, addUserToGroup, removeUserOfGroup, sendMessage, setBindingUserDefault, setUidSwitchDefault } = require('ids_api')` (for CommonJS) or `import { getAttributes, saveUser, updateAttributes, updatePassword, updateManagerPassword, addUserToGroup, removeUserOfGroup, sendMessage, setBindingUserDefault, setUidSwitchDefault } from 'ids_api'` (for ESM);
+2. set `IDS_BASE_URL`, `IDS_APP_ID` and `IDS_APP_SECRET` environments or you can create `.env` file which contains these envs or you can invoke `init` method to config them.
+3. import the lib via `const { init, getAttributes, saveUser, updateAttributes, updatePassword, updateManagerPassword, addUserToGroup, removeUserOfGroup, sendMessage, setBindingUserDefault, setUidSwitchDefault } = require('ids_api')` (for CommonJS) or `import { init, getAttributes, saveUser, updateAttributes, updatePassword, updateManagerPassword, addUserToGroup, removeUserOfGroup, sendMessage, setBindingUserDefault, setUidSwitchDefault } from 'ids_api'` (for ESM);
 4. use the imported api as you need.
 
 ## Todos

@@ -1,12 +1,24 @@
 import { equal, throws } from 'assert';
 import { expect } from 'chai';
-import { getAttributes, saveUser, updateAttributes, updatePassword, updateManagerPassword, addUserToGroup, removeUserOfGroup, sendMessage, setBindingUserDefault, setUidSwitchDefault } from '../src/index';
+import { init, get_config, getAttributes, saveUser, updateAttributes, updatePassword, updateManagerPassword, addUserToGroup, removeUserOfGroup, sendMessage, setBindingUserDefault, setUidSwitchDefault } from '../src/index';
 
 const uid = 'abc';
 describe('Typescript usage suite', function () {
     // https://mochajs.org/#timeouts
     // An outer value of 'this' is shadowed by this container.
     // this.timeout(0);
+    it('init should work as expected', async () => {
+        const override_config = {
+            ids_base_url: 'BASE_URL_HERE',
+            ids_app_id: 'APP_ID_HERE',
+            ids_app_secret: 'APP_SECRET_HERE',
+        };
+        init(override_config.ids_base_url, override_config.ids_app_id, override_config.ids_app_secret);
+        const { ids_base_url, ids_app_id, ids_app_secret, } = get_config();
+        equal(ids_base_url, override_config.ids_base_url);
+        equal(ids_app_id, override_config.ids_app_id);
+        equal(ids_app_secret, override_config.ids_app_secret);
+    });
     it('getAttributes should return a object result', async () => {
         equal(typeof await getAttributes(uid), 'object');
     });

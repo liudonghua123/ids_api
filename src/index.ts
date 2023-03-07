@@ -6,14 +6,34 @@ import { ATTRIBUTES_CREATE, POST_PARAMS, ATTRIBUTES, POST_PARAMS_MESSAGE, POST_P
 dotenv.config();
 const log = debug('app:log');
 
-const { BASE_URL, APP_ID, APP_SECRET } = process.env;
-if (!BASE_URL || !APP_ID || !APP_SECRET) throw new Error('Missing BASE_URL, APP_ID or APP_SECRET in .env file');
+const { IDS_BASE_URL, IDS_APP_ID, IDS_APP_SECRET } = process.env;
+if (!IDS_BASE_URL || !IDS_APP_ID || !IDS_APP_SECRET) log('Missing IDS_BASE_URL, IDS_APP_ID or IDS_APP_SECRET in environments, you need to config them using init method first');
 
-const base_url = BASE_URL as string;
-const app_id = APP_ID as string;
-const app_secret = APP_SECRET as string;
+let ids_base_url = IDS_BASE_URL as string;
+let ids_app_id = IDS_APP_ID as string;
+let ids_app_secret = IDS_APP_SECRET as string;
 
-log(`[app] base_url: ${base_url}, app_id: ${app_id}, app_secret: ${app_secret}`);
+log(`[app] ids_base_url: ${ids_base_url}, ids_app_id: ${ids_app_id}, ids_app_secret: ${ids_app_secret}`);
+
+/**
+ * The init method override the values of IDS_BASE_URL, IDS_APP_ID, IDS_APP_SECRET which maybe set in environments
+ * @param base_url the base url of ids server
+ * @param app_id the app id of ids server
+ * @param app_secret the app secret of ids server
+ */
+export function init(base_url: string, app_id: string, app_secret: string) {
+  ids_base_url = base_url;
+  ids_app_id = app_id;
+  ids_app_secret = app_secret;
+}
+
+export function get_config() {
+  return {
+    ids_base_url,
+    ids_app_id,
+    ids_app_secret,
+  };
+}
 
 /**
  * 获取用户属性信息
@@ -23,7 +43,7 @@ log(`[app] base_url: ${base_url}, app_id: ${app_id}, app_secret: ${app_secret}`)
 export async function getAttributes(uid: string) {
   const timeStamp = `${new Date().getTime()}`;
   const randomStr = generateRandomString();
-  const sign = signData(app_secret, timeStamp, randomStr, uid);
+  const sign = signData(ids_app_secret, timeStamp, randomStr, uid);
   log(`[getAttributes] sign: ${sign}`);
   const params = {
     uid,
@@ -31,7 +51,7 @@ export async function getAttributes(uid: string) {
     randomStr,
     sign,
   };
-  const result = await doPost(`${base_url}/authserver/restApi/internal/user/getAttributes`, params, app_id, app_secret);
+  const result = await doPost(`${ids_base_url}/authserver/restApi/internal/user/getAttributes`, params, ids_app_id, ids_app_secret);
   log(`[getAttributes] result: ${JSON.stringify(result)}`);
   return result;
 }
@@ -46,14 +66,14 @@ export async function saveUser(attributes: ATTRIBUTES_CREATE) {
   const randomStr = generateRandomString();
   const { password } = attributes;
   if (!password) throw new Error('Missing password in attributes');
-  const encryptedPassword = encrypt(app_secret, password as string, randomStr);
+  const encryptedPassword = encrypt(ids_app_secret, password as string, randomStr);
   log(`[saveUser] password: ${password}, encryptedPassword: ${encryptedPassword}`);
   // overwrite password with encrypted password
   attributes.password = encryptedPassword;
   let data: object | string = removeEmptyValues(attributes);
   data = JSON.stringify(data);
   log(`[updateAttributes] attributes: ${JSON.stringify(attributes)}, data: ${data}`);
-  const sign = signData(app_secret, timeStamp, randomStr, data);
+  const sign = signData(ids_app_secret, timeStamp, randomStr, data);
   log(`[saveUser] sign: ${sign}`);
   const params: POST_PARAMS = {
     data,
@@ -61,7 +81,7 @@ export async function saveUser(attributes: ATTRIBUTES_CREATE) {
     randomStr,
     sign,
   };
-  const result = await doPost(`${base_url}/authserver/restApi/internal/user/saveUser`, params, app_id, app_secret);
+  const result = await doPost(`${ids_base_url}/authserver/restApi/internal/user/saveUser`, params, ids_app_id, ids_app_secret);
   log(`[saveUser] result: ${JSON.stringify(result)}`);
   return result;
 }
@@ -78,7 +98,7 @@ export async function updateAttributes(uid: string, attributes: ATTRIBUTES) {
   let data: object | string = removeEmptyValues(attributes);
   log(`[updateAttributes] attributes: ${JSON.stringify(attributes)}, data: ${JSON.stringify(data)}`);
   data = JSON.stringify(data);
-  const sign = signData(app_secret, timeStamp, randomStr, `${uid}${data}`);
+  const sign = signData(ids_app_secret, timeStamp, randomStr, `${uid}${data}`);
   log(`[updateAttributes] sign: ${sign}`);
   const params: POST_PARAMS = {
     uid,
@@ -87,7 +107,7 @@ export async function updateAttributes(uid: string, attributes: ATTRIBUTES) {
     randomStr,
     sign,
   };
-  const result = await doPost(`${base_url}/authserver/restApi/internal/user/updateAttributes`, params, app_id, app_secret);
+  const result = await doPost(`${ids_base_url}/authserver/restApi/internal/user/updateAttributes`, params, ids_app_id, ids_app_secret);
   log(`[updateAttributes] result: ${JSON.stringify(result)}`);
   return result;
 }
@@ -102,9 +122,9 @@ export async function updateAttributes(uid: string, attributes: ATTRIBUTES) {
 export async function updatePassword(uid: string, oldPassword: string, newPassword: string) {
   const timeStamp = `${new Date().getTime()}`;
   const randomStr = generateRandomString();
-  const encryptedOldPassword = encrypt(app_secret, oldPassword as string, randomStr);
-  const encryptedNewPassword = encrypt(app_secret, newPassword as string, randomStr);
-  const sign = signData(app_secret, timeStamp, randomStr, `${uid}${encryptedOldPassword}${encryptedNewPassword}`);
+  const encryptedOldPassword = encrypt(ids_app_secret, oldPassword as string, randomStr);
+  const encryptedNewPassword = encrypt(ids_app_secret, newPassword as string, randomStr);
+  const sign = signData(ids_app_secret, timeStamp, randomStr, `${uid}${encryptedOldPassword}${encryptedNewPassword}`);
   log(`[updatePassword] sign: ${sign}`);
   const params = {
     uid,
@@ -114,7 +134,7 @@ export async function updatePassword(uid: string, oldPassword: string, newPasswo
     randomStr,
     sign,
   };
-  const result = await doPost(`${base_url}/authserver/restApi/internal/user/updatePassword`, params, app_id, app_secret);
+  const result = await doPost(`${ids_base_url}/authserver/restApi/internal/user/updatePassword`, params, ids_app_id, ids_app_secret);
   log(`[updatePassword] result: ${JSON.stringify(result)}`);
   return result;
 }
@@ -128,8 +148,8 @@ export async function updatePassword(uid: string, oldPassword: string, newPasswo
 export async function updateManagerPassword(uid: string, password: string) {
   const timeStamp = `${new Date().getTime()}`;
   const randomStr = generateRandomString();
-  const encryptePassword = encrypt(app_secret, password as string, randomStr);
-  const sign = signData(app_secret, timeStamp, randomStr, `${uid}${encryptePassword}`);
+  const encryptePassword = encrypt(ids_app_secret, password as string, randomStr);
+  const sign = signData(ids_app_secret, timeStamp, randomStr, `${uid}${encryptePassword}`);
   log(`[updateManagerPassword] sign: ${sign}`);
   const params = {
     uid,
@@ -138,7 +158,7 @@ export async function updateManagerPassword(uid: string, password: string) {
     randomStr,
     sign,
   };
-  const result = await doPost(`${base_url}/authserver/restApi/internal/manager/updatePassword`, params, app_id, app_secret);
+  const result = await doPost(`${ids_base_url}/authserver/restApi/internal/manager/updatePassword`, params, ids_app_id, ids_app_secret);
   log(`[updateManagerPassword] result: ${JSON.stringify(result)}`);
   return result;
 }
@@ -154,7 +174,7 @@ export async function addUserToGroup(uid: string, memberOf: [string]) {
   const randomStr = generateRandomString();
   const data = JSON.stringify({memberOf});
   log(`[addUserToGroup] data: ${data}`);
-  const sign = signData(app_secret, timeStamp, randomStr, `${uid}${data}`);
+  const sign = signData(ids_app_secret, timeStamp, randomStr, `${uid}${data}`);
   log(`[addUserToGroup] sign: ${sign}`);
   const params: POST_PARAMS = {
     uid,
@@ -163,7 +183,7 @@ export async function addUserToGroup(uid: string, memberOf: [string]) {
     randomStr,
     sign,
   };
-  const result = await doPost(`${base_url}/authserver/restApi/internal/group/addUserToGroup`, params, app_id, app_secret);
+  const result = await doPost(`${ids_base_url}/authserver/restApi/internal/group/addUserToGroup`, params, ids_app_id, ids_app_secret);
   log(`[addUserToGroup] result: ${JSON.stringify(result)}`);
   return result;
 }
@@ -179,7 +199,7 @@ export async function removeUserOfGroup(uid: string, memberOf: [string]) {
   const randomStr = generateRandomString();
   const data = JSON.stringify({memberOf});
   log(`[removeUserOfGroup] data: ${data}`);
-  const sign = signData(app_secret, timeStamp, randomStr, `${uid}${data}`);
+  const sign = signData(ids_app_secret, timeStamp, randomStr, `${uid}${data}`);
   log(`[removeUserOfGroup] sign: ${sign}`);
   const params: POST_PARAMS = {
     uid,
@@ -188,7 +208,7 @@ export async function removeUserOfGroup(uid: string, memberOf: [string]) {
     randomStr,
     sign,
   };
-  const result = await doPost(`${base_url}/authserver/restApi/internal/group/removeUserOfGroup`, params, app_id, app_secret);
+  const result = await doPost(`${ids_base_url}/authserver/restApi/internal/group/removeUserOfGroup`, params, ids_app_id, ids_app_secret);
   log(`[removeUserOfGroup] result: ${JSON.stringify(result)}`);
   return result;
 }
@@ -204,9 +224,9 @@ export async function removeUserOfGroup(uid: string, memberOf: [string]) {
 export async function sendMessage(uid: string, title: string, msgContent: string) {
   const timeStamp = `${new Date().getTime()}`;
   const randomStr = generateRandomString();
-  const encryptedTitle = encrypt(app_secret, title, randomStr);
-  const encryptedMsgContent = encrypt(app_secret, msgContent, randomStr);
-  const sign = signData(app_secret, timeStamp, randomStr, `${uid}`);
+  const encryptedTitle = encrypt(ids_app_secret, title, randomStr);
+  const encryptedMsgContent = encrypt(ids_app_secret, msgContent, randomStr);
+  const sign = signData(ids_app_secret, timeStamp, randomStr, `${uid}`);
   log(`[sendMessage] sign: ${sign}`);
   const params: POST_PARAMS_MESSAGE = {
     uid,
@@ -216,7 +236,7 @@ export async function sendMessage(uid: string, title: string, msgContent: string
     randomStr,
     sign,
   };
-  const result = await doPost(`${base_url}/authserver/restApi/internal/manager/sendMessage`, params, app_id, app_secret);
+  const result = await doPost(`${ids_base_url}/authserver/restApi/internal/manager/sendMessage`, params, ids_app_id, ids_app_secret);
   log(`[sendMessage] result: ${JSON.stringify(result)}`);
   return result;
 }
@@ -230,7 +250,7 @@ export async function sendMessage(uid: string, title: string, msgContent: string
 export async function setBindingUserDefault(uid: string, defaultUid: string) {
   const timeStamp = `${new Date().getTime()}`;
   const randomStr = generateRandomString();
-  const sign = signData(app_secret, timeStamp, randomStr, `${uid}`);
+  const sign = signData(ids_app_secret, timeStamp, randomStr, `${uid}`);
   log(`[setBindingUserDefault] sign: ${sign}`);
   const params: POST_PARAMS_BINDINGUSER = {
     uid,
@@ -239,7 +259,7 @@ export async function setBindingUserDefault(uid: string, defaultUid: string) {
     randomStr,
     sign,
   };
-  const result = await doPost(`${base_url}/authserver/restApi/internal/identity/setBindingUserDefault`, params, app_id, app_secret);
+  const result = await doPost(`${ids_base_url}/authserver/restApi/internal/identity/setBindingUserDefault`, params, ids_app_id, ids_app_secret);
   log(`[setBindingUserDefault] result: ${JSON.stringify(result)}`);
   return result;
 }
@@ -253,7 +273,7 @@ export async function setBindingUserDefault(uid: string, defaultUid: string) {
 export async function setUidSwitchDefault(uid: string, defaultUserNO: string) {
   const timeStamp = `${new Date().getTime()}`;
   const randomStr = generateRandomString();
-  const sign = signData(app_secret, timeStamp, randomStr, `${uid}`);
+  const sign = signData(ids_app_secret, timeStamp, randomStr, `${uid}`);
   log(`[setUidSwitchDefault] sign: ${sign}`);
   const params: POST_PARAMS_UIDSWITCH = {
     uid,
@@ -262,7 +282,7 @@ export async function setUidSwitchDefault(uid: string, defaultUserNO: string) {
     randomStr,
     sign,
   };
-  const result = await doPost(`${base_url}/authserver/restApi/internal/identity/setUidSwitchDefault`, params, app_id, app_secret);
+  const result = await doPost(`${ids_base_url}/authserver/restApi/internal/identity/setUidSwitchDefault`, params, ids_app_id, ids_app_secret);
   log(`[setUidSwitchDefault] result: ${JSON.stringify(result)}`);
   return result;
 }
