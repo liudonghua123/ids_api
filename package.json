@@ -1,6 +1,6 @@
 {
   "name": "ids_api",
-  "version": "0.1.0",
+  "version": "0.1.2",
   "description": "node api for ids of wisedu",
   "main": "dist/cjs/index.js",
   "module": "dist/esm/index.js",
